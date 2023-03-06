@@ -23,8 +23,8 @@ final class RMCharacterCollectionViewCellViewModel {
         self.characterImageUrl = characterImageUrl
     }
     
-    var characterStatusText: String {
-        return characterStatus.rawValue
+    public var characterStatusText: String {
+        return "Status: " + characterStatus.rawValue 
     }
     
     public func fetchImage(completion: @escaping (Result<Data, Error>) -> Void) {
