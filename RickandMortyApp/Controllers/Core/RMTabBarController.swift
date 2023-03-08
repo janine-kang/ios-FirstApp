@@ -15,6 +15,8 @@ final class RMTabBarController: UITabBarController {
         view.backgroundColor = .purple
         setUpTabs()
     }
+    
+    /// 앱 초기 세팅
     private func setUpTabs() {
         let charactersVC = RMCharacterViewController()
         let locationsVC = RMLocationViewController()
