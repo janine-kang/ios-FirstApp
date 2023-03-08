@@ -73,7 +73,6 @@ extension RMCharacterListViewViewModel: UICollectionViewDataSource, UICollection
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: RMCharacterCollectionViewCell.cellIdentifier, for: indexPath) as? RMCharacterCollectionViewCell else {
             fatalError("Unsupported cell")
         }
-        print(indexPath)
         cell.configure(with: cellViewModels[indexPath.row])
         return cell
     }
@@ -104,10 +103,9 @@ extension RMCharacterListViewViewModel: UICollectionViewDataSource, UICollection
         )
     }
     
-    func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         collectionView.deselectItem(at: indexPath, animated: true)
         let character = characters[indexPath.row]
-        print(indexPath.row)
         delegate?.didSelectCharacter(character)
     }
 }
