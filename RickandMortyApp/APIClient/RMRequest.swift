@@ -79,6 +79,7 @@ final class RMRequest {
         if !string.contains(Constants.baseUrl) {
             return nil
         }
+        
         let trimmed = string.replacingOccurrences(of: Constants.baseUrl + "/", with: "")
         if trimmed.contains("/") {
             let components = trimmed.components(separatedBy: "/")
@@ -90,11 +91,20 @@ final class RMRequest {
                 }
             }
         } else if trimmed.contains("?") {
+            /// DEBUG: when components is not empty, data processing needed
+            
             let components = trimmed.components(separatedBy: "?")
-            if !components.isEmpty {
+            if !components.isEmpty, components.count >= 2 {
                 let endpointString = components[0]
+                let queryItemsString = components[1]
+                let queryItems:[URLQueryItem] = queryItemsString.components(separatedBy: "&").compactMap({
+                    guard $0.contains("=") else {
+                        return nil
+                    }
+                    let part = $0.components(separatedBy: "=")
+                    return URLQueryItem(name: part[0], value: part[1])})
                 if let rmEndpoint = RMEndpoint(rawValue: endpointString) {
-                    self.init(endpoint: rmEndpoint)
+                    self.init(endpoint: rmEndpoint, queryParameters: queryItems)
                     return
                 }
             }

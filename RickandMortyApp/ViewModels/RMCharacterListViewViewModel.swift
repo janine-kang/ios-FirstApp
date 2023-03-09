@@ -23,7 +23,8 @@ final class RMCharacterListViewViewModel: NSObject {
     
     private var characters: [RMCharacter] = [] {
         didSet {
-            for character in characters {
+            for character in characters where cellViewModels.contains(where: { $0.characterName == character.name
+            }) {
                 let viewModel = RMCharacterCollectionViewCellViewModel(characterName: character.name, characterStatus: character.status, characterImageUrl: URL(string: character.image))
                 cellViewModels.append(viewModel)
             }
@@ -66,30 +67,35 @@ final class RMCharacterListViewViewModel: NSObject {
             return
         }
         RMService.shared.execute(request, expecting: RMGetAllCharactersResponse.self) { [weak self] result in
-            guard let stringSelf = self else {
+            guard let strongSelf = self else {
                 return
             }
             switch result {
             case .success(let responseModel):
+                print("Pre-fetch:  \(strongSelf.cellViewModels.count)")
                 let moreResults = responseModel.results
                 let info = responseModel.info
-                stringSelf.apiInfo = info
+                strongSelf.apiInfo = info
                 
-                let originalCount = stringSelf.characters.count
+                let originalCount = strongSelf.characters.count
                 let newCount = moreResults.count
                 let total = originalCount + newCount
                 let startingIndex = total - newCount - 1
                 let indexPathsToAdd: [IndexPath] = Array(startingIndex..<(startingIndex + newCount)).compactMap { return IndexPath(row: $0, section: 0)
-                }              
-                stringSelf.characters.append(contentsOf: moreResults)
+                }
+                print("🦞 \(indexPathsToAdd)")
+                strongSelf.characters.append(contentsOf: moreResults)
                 DispatchQueue.main.async {
                     /// trigger update
-                    stringSelf.delegate?.didLoadMoreCharacters(with: indexPathsToAdd)
-                    stringSelf.isLoadingMoreCharacters = false
+                    strongSelf.delegate?.didLoadMoreCharacters(with: indexPathsToAdd)
+                    /// DEBUG: duplicate view model creation
+                    /// SOLUTION: 26 line - add condition whether already exist in array or not
+//                    print("Post-fetch:  \(strongSelf.cellViewModels.count) ")
+                    strongSelf.isLoadingMoreCharacters = false
                 }
             case .failure(let failure):
                 print(String(describing: failure))
-                stringSelf.isLoadingMoreCharacters = false
+                strongSelf.isLoadingMoreCharacters = false
             }
         }
         
