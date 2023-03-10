@@ -26,7 +26,9 @@ final class RMCharacterListViewViewModel: NSObject {
             for character in characters where cellViewModels.contains(where: { $0.characterName == character.name
             }) {
                 let viewModel = RMCharacterCollectionViewCellViewModel(characterName: character.name, characterStatus: character.status, characterImageUrl: URL(string: character.image))
-                cellViewModels.append(viewModel)
+                if !cellViewModels.contains(viewModel) {
+                    cellViewModels.append(viewModel)
+                }
             }
         }
     }
@@ -72,7 +74,7 @@ final class RMCharacterListViewViewModel: NSObject {
             }
             switch result {
             case .success(let responseModel):
-                print("Pre-fetch:  \(strongSelf.cellViewModels.count)")
+                
                 let moreResults = responseModel.results
                 let info = responseModel.info
                 strongSelf.apiInfo = info
@@ -80,11 +82,13 @@ final class RMCharacterListViewViewModel: NSObject {
                 let originalCount = strongSelf.characters.count
                 let newCount = moreResults.count
                 let total = originalCount + newCount
-                let startingIndex = total - newCount - 1
-                let indexPathsToAdd: [IndexPath] = Array(startingIndex..<(startingIndex + newCount)).compactMap { return IndexPath(row: $0, section: 0)
-                }
-                print("🦞 \(indexPathsToAdd)")
+                let startingIndex = total - newCount
+                let indexPathsToAdd: [IndexPath] = Array(startingIndex..<startingIndex + newCount).compactMap({
+                    return IndexPath(row: $0, section: 0)
+                })
+                print(indexPathsToAdd)
                 strongSelf.characters.append(contentsOf: moreResults)
+                print(String(strongSelf.cellViewModels.count))
                 DispatchQueue.main.async {
                     /// trigger update
                     strongSelf.delegate?.didLoadMoreCharacters(with: indexPathsToAdd)
