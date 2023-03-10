@@ -23,8 +23,7 @@ final class RMCharacterListViewViewModel: NSObject {
     
     private var characters: [RMCharacter] = [] {
         didSet {
-            for character in characters where cellViewModels.contains(where: { $0.characterName == character.name
-            }) {
+            for character in characters {
                 let viewModel = RMCharacterCollectionViewCellViewModel(characterName: character.name, characterStatus: character.status, characterImageUrl: URL(string: character.image))
                 if !cellViewModels.contains(viewModel) {
                     cellViewModels.append(viewModel)
@@ -92,9 +91,6 @@ final class RMCharacterListViewViewModel: NSObject {
                 DispatchQueue.main.async {
                     /// trigger update
                     strongSelf.delegate?.didLoadMoreCharacters(with: indexPathsToAdd)
-                    /// DEBUG: duplicate view model creation
-                    /// SOLUTION: 26 line - add condition whether already exist in array or not
-//                    print("Post-fetch:  \(strongSelf.cellViewModels.count) ")
                     strongSelf.isLoadingMoreCharacters = false
                 }
             case .failure(let failure):
