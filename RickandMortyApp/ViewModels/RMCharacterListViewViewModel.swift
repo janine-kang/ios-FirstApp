@@ -25,7 +25,9 @@ final class RMCharacterListViewViewModel: NSObject {
         didSet {
             for character in characters {
                 let viewModel = RMCharacterCollectionViewCellViewModel(characterName: character.name, characterStatus: character.status, characterImageUrl: URL(string: character.image))
-                cellViewModels.append(viewModel)
+                if !cellViewModels.contains(viewModel) {
+                    cellViewModels.append(viewModel)
+                }
             }
         }
     }
@@ -66,30 +68,34 @@ final class RMCharacterListViewViewModel: NSObject {
             return
         }
         RMService.shared.execute(request, expecting: RMGetAllCharactersResponse.self) { [weak self] result in
-            guard let stringSelf = self else {
+            guard let strongSelf = self else {
                 return
             }
             switch result {
             case .success(let responseModel):
+                
                 let moreResults = responseModel.results
                 let info = responseModel.info
-                stringSelf.apiInfo = info
+                strongSelf.apiInfo = info
                 
-                let originalCount = stringSelf.characters.count
+                let originalCount = strongSelf.characters.count
                 let newCount = moreResults.count
                 let total = originalCount + newCount
-                let startingIndex = total - newCount - 1
-                let indexPathsToAdd: [IndexPath] = Array(startingIndex..<(startingIndex + newCount)).compactMap { return IndexPath(row: $0, section: 0)
-                }              
-                stringSelf.characters.append(contentsOf: moreResults)
+                let startingIndex = total - newCount
+                let indexPathsToAdd: [IndexPath] = Array(startingIndex..<startingIndex + newCount).compactMap({
+                    return IndexPath(row: $0, section: 0)
+                })
+                print(indexPathsToAdd)
+                strongSelf.characters.append(contentsOf: moreResults)
+                print(String(strongSelf.cellViewModels.count))
                 DispatchQueue.main.async {
                     /// trigger update
-                    stringSelf.delegate?.didLoadMoreCharacters(with: indexPathsToAdd)
-                    stringSelf.isLoadingMoreCharacters = false
+                    strongSelf.delegate?.didLoadMoreCharacters(with: indexPathsToAdd)
+                    strongSelf.isLoadingMoreCharacters = false
                 }
             case .failure(let failure):
                 print(String(describing: failure))
-                stringSelf.isLoadingMoreCharacters = false
+                strongSelf.isLoadingMoreCharacters = false
             }
         }
         
