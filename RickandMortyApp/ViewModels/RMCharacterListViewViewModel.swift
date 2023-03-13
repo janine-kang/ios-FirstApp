@@ -85,9 +85,9 @@ final class RMCharacterListViewViewModel: NSObject {
                 let indexPathsToAdd: [IndexPath] = Array(startingIndex..<startingIndex + newCount).compactMap({
                     return IndexPath(row: $0, section: 0)
                 })
-                print(indexPathsToAdd)
+                /// Append characters by Computed Properties
                 strongSelf.characters.append(contentsOf: moreResults)
-                print(String(strongSelf.cellViewModels.count))
+                
                 DispatchQueue.main.async {
                     /// trigger update
                     strongSelf.delegate?.didLoadMoreCharacters(with: indexPathsToAdd)

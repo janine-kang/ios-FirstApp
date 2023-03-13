@@ -72,7 +72,6 @@ final class RMCharacterListView: UIView {
         collectionView.delegate = viewModel
         collectionView.dataSource = viewModel
     }
-    
 }
 
 extension RMCharacterListView: RMCharacterListViewViewModelDelegate {
