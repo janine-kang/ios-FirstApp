@@ -30,7 +30,7 @@ class RMCharacterPhotoCollectionViewCell: UICollectionViewCell {
     
     private func setUpConstraints() {
         NSLayoutConstraint.activate([
-            imageView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            imageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
             imageView.leftAnchor.constraint(equalTo: contentView.leftAnchor),
             imageView.rightAnchor.constraint(equalTo: contentView.rightAnchor),
             imageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
